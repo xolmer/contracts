@@ -46,5 +46,6 @@ contract Lottery {
         uint256 index = r % players.length;
         winner = players[index];
         winner.transfer(getBalance());
+        players = new address payable[](0); // clear the array
     }
 }
