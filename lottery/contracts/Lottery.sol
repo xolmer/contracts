@@ -12,10 +12,7 @@ contract Lottery {
     /// @notice Register a player to the lottery
     receive() external payable {
         require(msg.value == 0.03 ether, "You must send exactly 0.03 ether");
-
-        if (msg.value > 0) {
-            players.push(payable(msg.sender));
-        }
+        players.push(payable(msg.sender));
     }
 
     /// @notice Get the balance of the lottery
