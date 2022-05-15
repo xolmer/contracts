@@ -7,10 +7,17 @@ contract Lottery {
 
     constructor() {
         manager = msg.sender;
+
+        ///@notice Adding the manager to the lottery
+        // players.push(payable(manager));
     }
 
     /// @notice Register a player to the lottery
     receive() external payable {
+        require(
+            msg.sender != manager,
+            "You are the manager, you can't play the lottery"
+        );
         require(msg.value == 0.03 ether, "You must send exactly 0.03 ether");
         players.push(payable(msg.sender));
     }
