@@ -37,7 +37,7 @@ contract Lottery {
             );
     }
 
-    function pickWinner() public view returns (address) {
+    function pickWinner() public {
         require(msg.sender == manager, "You are not the manager");
         require(players.length >= 3, "There are not enough players");
 
@@ -45,6 +45,6 @@ contract Lottery {
         address payable winner;
         uint256 index = r % players.length;
         winner = players[index];
-        return winner;
+        winner.transfer(getBalance());
     }
 }
