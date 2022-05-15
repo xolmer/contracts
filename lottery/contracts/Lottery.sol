@@ -21,7 +21,7 @@ contract Lottery {
         return address(this).balance;
     }
 
-    function random() public view returns (uint256) {
+    function random() internal view returns (uint256) {
         return
             uint256(
                 keccak256(
