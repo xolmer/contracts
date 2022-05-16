@@ -39,6 +39,11 @@ contract Auction {
         _;
     }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+
     modifier beforeEnd() {
         require(block.number <= endBlock, "Auction has already ended");
         _;
@@ -50,6 +55,10 @@ contract Auction {
         } else {
             return b;
         }
+    }
+
+    function cancelAuction() public onlyOwner {
+        auctionState = State.Cancelled;
     }
 
     function placeBid() public payable notOwner afterStart beforeEnd {
@@ -76,5 +85,42 @@ contract Auction {
             );
             highestBidder = payable(msg.sender);
         }
+    }
+
+    function finalizeAuction() public {
+        require(
+            auctionState == State.Cancelled || block.number > endBlock,
+            "Auction is not ended"
+        );
+        require(
+            msg.sender == owner || bids[msg.sender] > 0,
+            "You must bid to finalize"
+        );
+        address payable recipient;
+        uint256 value;
+
+        if (auctionState == State.Cancelled) {
+            // Cancelled
+            recipient = payable(msg.sender);
+            value = bids[msg.sender];
+        } else {
+            // Auction ended(not canceled)
+            if (msg.sender == owner) {
+                //this is the owner
+                recipient = owner;
+                value = highestBindingBid;
+            } else {
+                //this is the bidder
+                if (msg.sender == highestBidder) {
+                    recipient = highestBidder;
+                    value = bids[highestBidder] - highestBindingBid;
+                } else {
+                    //this is someone else
+                    recipient = payable(msg.sender);
+                    value = bids[msg.sender];
+                }
+            }
+        }
+        recipient.transfer(value);
     }
 }
